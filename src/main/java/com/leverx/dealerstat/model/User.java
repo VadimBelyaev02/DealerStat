@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "dealer_user")
 @NoArgsConstructor
-public class User extends BaseEntity{
+public class User extends BaseEntity {
 
     @NotEmpty
     @Column(name = "first_name")

@@ -22,6 +22,7 @@ public class GameObject extends BaseEntity {
 
     @NotEmpty
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @NotEmpty
