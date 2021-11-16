@@ -40,8 +40,11 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<GameObject> gameObjects;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Confirmation confirmation;
 
     public String getFirst_name() {
         return firstName;

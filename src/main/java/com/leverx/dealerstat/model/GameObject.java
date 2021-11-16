@@ -43,7 +43,7 @@ public class GameObject extends BaseEntity {
     @Column(name = "price")
     private BigDecimal price;
 
-    @OneToMany(mappedBy = "gameObject")
+    @OneToMany(mappedBy = "gameObject", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
     @ManyToMany
@@ -51,6 +51,7 @@ public class GameObject extends BaseEntity {
                joinColumns = @JoinColumn(name = "game_object_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "game_id", referencedColumnName = "id"))
     private List<Game> games;
+
 
     public String getTitle() {
         return title;
