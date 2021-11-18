@@ -1,6 +1,13 @@
 package com.leverx.dealerstat.service;
 
+import com.leverx.dealerstat.model.User;
+
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
+
 public interface MailSenderService {
 
-    void sendMessage(String to);
+    void sendVerificationCode(User user);
+
+    void sendMessageToRecoverPassword(User user);
 }
