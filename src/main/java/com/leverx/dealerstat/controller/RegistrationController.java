@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/register")
 public class RegistrationController {
 
     private final UsersService usersService;
@@ -34,8 +33,7 @@ public class RegistrationController {
         this.mailSenderService = mailSenderService;
     }
 
-
-    @PostMapping()
+    @PostMapping("/register")
     public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserDTO user) {
         User userEntity = converter.convertToModel(user);
         try {
@@ -45,6 +43,16 @@ public class RegistrationController {
         } catch (AlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<UserDTO> verifyUser(@RequestParam("code") String code) {
+        User user = confirmationsService.findUserByCode(code);
+        if (user == null || user.isConfirmed()) {
+            return ResponseEntity.notFound().build();
+        }
+        usersService.confirm(user);
         return ResponseEntity.ok().build();
     }
 }
