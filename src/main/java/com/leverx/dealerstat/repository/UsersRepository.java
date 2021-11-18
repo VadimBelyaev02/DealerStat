@@ -1,9 +1,18 @@
 package com.leverx.dealerstat.repository;
 
+import com.leverx.dealerstat.model.Confirmation;
 import com.leverx.dealerstat.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UsersRepository extends JpaRepository<User, Long> {
+
+    boolean existsByEmail(String email);
+
+    Optional<User> findByConfirmation(Confirmation confirmation);
+
+
 }
