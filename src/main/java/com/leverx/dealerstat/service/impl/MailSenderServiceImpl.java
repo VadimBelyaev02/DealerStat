@@ -32,9 +32,13 @@ public class MailSenderServiceImpl implements MailSenderService {
         String fromAddress = from;
         String senderName = "DealerStat";
         String subject = "Please verify your registration";
-        String content = "Dear [[name]],<br>"
+        String siteURL = "http://localhost";
+        String fullName = user.getFirstName() + " " + user.getLastName();
+        String verifyURL = siteURL + "/verify?code=" + user.getConfirmation().getCode();
+
+        String content = "Dear " + fullName + ",<br>"
                 + "Please click the link below to verify your registration:<br>"
-                + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
+                + "<a href=\"" + verifyURL + "\">VERIFY</a><br>"
                 + "Thank you,<br>"
                 + "DealerStat.";
 
@@ -46,12 +50,6 @@ public class MailSenderServiceImpl implements MailSenderService {
             helper.setFrom(fromAddress, senderName);
             helper.setTo(toAddress);
             helper.setSubject(subject);
-            String siteURL = "localhost:8080";
-            content = content.replace("[[name]]", user.getFirstName());
-            String verifyURL = siteURL + "/verify?code=" + user.getConfirmation().getCode();
-
-            content = content.replace("[[URL]]", verifyURL);
-
             helper.setText(content, true);
 
             mailSender.send(message);
