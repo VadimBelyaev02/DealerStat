@@ -20,8 +20,10 @@ public class GameObjectsController {
         this.service = service;
     }
 
-    @PutMapping("/object")
-    public ResponseEntity<GameObjectDTO> editGameObject(@RequestBody GameObject gameObject) {
+    @PutMapping("/object/{id}")
+    public ResponseEntity<GameObjectDTO> editGameObject(@RequestBody GameObject gameObject,
+                                                        @PathVariable("id") Long id) {
+
         return null;
     }
 

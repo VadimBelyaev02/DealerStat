@@ -5,6 +5,7 @@ import com.leverx.dealerstat.model.User;
 import com.leverx.dealerstat.repository.ConfirmationsRepository;
 import com.leverx.dealerstat.service.ConfirmationsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,6 +16,8 @@ public class ConfirmationsServiceImpl implements ConfirmationsService {
 
     private final ConfirmationsRepository repository;
 
+    private final long oneDayInMilliseconds = 8640;
+
     @Autowired
     public ConfirmationsServiceImpl(ConfirmationsRepository repository) {
         this.repository = repository;
@@ -23,7 +26,7 @@ public class ConfirmationsServiceImpl implements ConfirmationsService {
     @Override
     public void save(User userEntity) {
         String code = UUID.randomUUID().toString();
-        Date expirationTime = new Date(24 * 60 * 60 * 1000);
+        Date expirationTime = new Date(new Date().getTime() + oneDayInMilliseconds);
 
         Confirmation confirmation = new Confirmation();
         confirmation.setCode(code);

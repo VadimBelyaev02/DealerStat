@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -34,11 +34,9 @@ public class CommentsController {
     }
 
     @GetMapping("/users/{userId}/comments/{commentId}")
-    public ResponseEntity<CommentDTO> getComment(@PathVariable("userId") Long userId,
-                                                 @PathVariable("commentId") Long commentId) {
-        if (userId == null || commentId == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<CommentDTO> getComment(@PathVariable("userId") @NotNull Long userId,
+                                                 @PathVariable("commentId") @NotNull Long commentId) {
+
 
         CommentDTO commentDTO = service.getComment(userId, commentId);
         return ResponseEntity.ok(commentDTO);

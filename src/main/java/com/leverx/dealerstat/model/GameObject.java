@@ -1,5 +1,8 @@
 package com.leverx.dealerstat.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -9,6 +12,9 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.List;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "game_objects")
 public class GameObject extends BaseEntity {
@@ -19,11 +25,6 @@ public class GameObject extends BaseEntity {
 
     @Column(name = "description")
     private String description;
-
-    @NotEmpty
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private Status status;
 
     @NotEmpty
     @ManyToOne()
@@ -67,14 +68,6 @@ public class GameObject extends BaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     public User getAuthor() {

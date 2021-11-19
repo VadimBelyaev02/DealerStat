@@ -1,8 +1,6 @@
 package com.leverx.dealerstat.converter;
 
 import com.leverx.dealerstat.dto.CommentDTO;
-import com.leverx.dealerstat.dto.GameObjectDTO;
-import com.leverx.dealerstat.dto.UserDTO;
 import com.leverx.dealerstat.model.Comment;
 import org.springframework.stereotype.Component;
 
