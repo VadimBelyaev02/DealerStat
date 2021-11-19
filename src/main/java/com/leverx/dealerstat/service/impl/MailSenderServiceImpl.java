@@ -5,7 +5,6 @@ import com.leverx.dealerstat.model.User;
 import com.leverx.dealerstat.service.MailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -17,35 +16,57 @@ import java.io.UnsupportedEncodingException;
 @Service
 public class MailSenderServiceImpl implements MailSenderService {
 
-    private final JavaMailSender mailSender;
-
     @Value("${spring.mail.username}")
-    private String from;
+    private String fromAddress;
+    private final JavaMailSender mailSender;
+    private final MimeMessage message;
+    private final MimeMessageHelper helper;
+    private final String siteURL = "http://localhost";
+    private final String senderName = "DealerStat";
+    private String subject;
+    private String fullName;
+    private String URL;
+    private String toAddress;
+    private String content;
 
     @Autowired
     public MailSenderServiceImpl(JavaMailSender sender) {
         this.mailSender = sender;
+        this.message = mailSender.createMimeMessage();
+        this.helper = new MimeMessageHelper(message);
     }
 
     @Override
     public void sendVerificationCode(User user)  {
-        String fromAddress = from;
-        String senderName = "DealerStat";
-        String subject = "Please verify your registration";
-        String siteURL = "http://localhost";
-        String fullName = user.getFirstName() + " " + user.getLastName();
-        String verifyURL = siteURL + "/verify?code=" + user.getConfirmation().getCode();
+        subject = "Please verify your registration";
+        fullName = user.getFirstName() + " " + user.getLastName();
+        toAddress = user.getEmail();
+        URL = siteURL + "/auth/confirm?code=" + user.getConfirmation().getCode();
 
-        String content = "Dear " + fullName + ",<br>"
+        content = "Dear " + fullName + ",<br>"
                 + "Please click the link below to verify your registration:<br>"
-                + "<a href=\"" + verifyURL + "\">VERIFY</a><br>"
+                + "<a href=\"" + URL + "\">CONFIRM</a><br>"
                 + "Thank you,<br>"
-                + "DealerStat.";
+                + senderName;
+        sendMessage();
+    }
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
+    @Override
+    public void sendMessageToRecoverPassword(User user) {
+        subject = "Password recovery";
+        fullName = user.getFirstName() + " " + user.getLastName();
+        toAddress = user.getEmail();
+        URL = siteURL + "/auth/reset?code=" + user.getConfirmation().getCode();
 
-        String toAddress = user.getEmail();
+        content = "Dear " + fullName + ",<br>"
+                + "Please click the link below to recover your password:<br>"
+                + "<a href=\"" + URL + "\">RECOVER</a><br>"
+                + "Thank you,<br>"
+                + senderName;
+        sendMessage();
+    }
+
+    private void sendMessage() {
         try {
             helper.setFrom(fromAddress, senderName);
             helper.setTo(toAddress);
@@ -58,8 +79,4 @@ public class MailSenderServiceImpl implements MailSenderService {
         }
     }
 
-    @Override
-    public void sendMessageToRecoverPassword(User user) {
-
-    }
 }
