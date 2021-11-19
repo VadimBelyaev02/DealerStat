@@ -9,6 +9,7 @@ import com.leverx.dealerstat.repository.ConfirmationsRepository;
 import com.leverx.dealerstat.repository.UsersRepository;
 import com.leverx.dealerstat.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,8 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public User findByEmail(String email) throws NotFoundException {
-        return repository.findByEmail(email).orElseThrow(NotFoundException::new);
+        return repository.findByEmail(email).orElseThrow(() -> {
+            throw new UsernameNotFoundException("User doesn't exist");
+        });
     }
 }

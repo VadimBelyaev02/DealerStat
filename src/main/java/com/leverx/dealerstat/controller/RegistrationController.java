@@ -34,7 +34,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserDTO user) {
+    public ResponseEntity<UserDTO> register(@Valid @RequestBody UserDTO user) {
         User userEntity = converter.convertToModel(user);
         try {
             usersService.save(userEntity);
@@ -46,13 +46,5 @@ public class RegistrationController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/verify")
-    public ResponseEntity<UserDTO> verifyUser(@RequestParam("code") String code) {
-        User user = confirmationsService.findUserByCode(code);
-        if (user == null || user.isConfirmed()) {
-            return ResponseEntity.notFound().build();
-        }
-        usersService.confirm(user);
-        return ResponseEntity.ok().build();
-    }
+
 }
