@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import java.util.Calendar;
 import java.util.Date;
 
 @Builder
@@ -20,6 +19,7 @@ public class Confirmation extends BaseEntity{
     @Column(name = "hash_code")
     private String code;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "expiration_time")
     private Date expirationTime;
 
