@@ -1,15 +1,10 @@
 package com.leverx.dealerstat.converter;
 
-import com.leverx.dealerstat.dto.CommentDTO;
-import com.leverx.dealerstat.dto.ConfirmationDTO;
-import com.leverx.dealerstat.dto.GameObjectDTO;
 import com.leverx.dealerstat.dto.UserDTO;
 import com.leverx.dealerstat.model.User;
 import org.springframework.stereotype.Component;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @Component
 public class UsersConverter {
