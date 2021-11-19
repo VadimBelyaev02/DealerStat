@@ -1,5 +1,8 @@
 package com.leverx.dealerstat.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -8,6 +11,9 @@ import javax.validation.constraints.NotEmpty;
 import java.util.Calendar;
 import java.util.Date;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "comments")
 public class Comment extends BaseEntity {
@@ -24,20 +30,20 @@ public class Comment extends BaseEntity {
     @NotEmpty
     @ManyToOne()
     @JoinColumn(name = "author_id")
-    private User user;
+    private User author;
 
     @NotEmpty
     @Column(name = "created_at")
-    @CreatedDate
-    private Calendar dateOfCreating;
+    @Temporal(TemporalType.DATE)
+    private Date creatingDate;
 
     @NotEmpty
     @Column(name = "approved")
     private Boolean approved;
 
     @NotEmpty
-    @Column(name = "mark")
-    private Float mark;
+    @Column(name = "rate")
+    private Float rate;
 
     public String getMessage() {
         return message;
@@ -55,20 +61,20 @@ public class Comment extends BaseEntity {
         this.gameObject = gameObject;
     }
 
-    public User getUser() {
-        return user;
+    public User getAuthor() {
+        return author;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
-    public Calendar getDateOfCreating() {
-        return dateOfCreating;
+    public Date getCreatingDate() {
+        return creatingDate;
     }
 
-    public void setDateOfCreating(Calendar dateOfCreating) {
-        this.dateOfCreating = dateOfCreating;
+    public void setCreatingDate(Date creatingDate) {
+        this.creatingDate = creatingDate;
     }
 
     public Boolean getApproved() {
@@ -79,11 +85,11 @@ public class Comment extends BaseEntity {
         this.approved = approved;
     }
 
-    public Float getMark() {
-        return mark;
+    public Float getRate() {
+        return rate;
     }
 
-    public void setMark(Float mark) {
-        this.mark = mark;
+    public void setRate(Float rate) {
+        this.rate = rate;
     }
 }

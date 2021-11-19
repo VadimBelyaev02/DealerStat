@@ -1,16 +1,20 @@
 package com.leverx.dealerstat.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
-@NoArgsConstructor
 public class User extends BaseEntity {
 
     @NotEmpty
@@ -29,15 +33,15 @@ public class User extends BaseEntity {
     @Column(name = "email")
     private String email;
 
-    @NotEmpty
     @Column(name = "created_at")
-    private Calendar dateOfCreating;
+    @Temporal(TemporalType.DATE)
+    private Date creatingDate;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "role")
     private Role role;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "author")
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
@@ -46,20 +50,23 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Confirmation confirmation;
 
-    public String getFirst_name() {
+    @Column(name = "confirmed")
+    private boolean isConfirmed;
+
+    public String getFirstName() {
         return firstName;
     }
 
-    public void setFirst_name(String first_name) {
-        this.firstName = first_name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getLast_name() {
+    public String getLastName() {
         return lastName;
     }
 
-    public void setLast_name(String last_name) {
-        this.lastName = last_name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPassword() {
@@ -78,12 +85,12 @@ public class User extends BaseEntity {
         this.email = email;
     }
 
-    public Calendar getDateOfCreating() {
-        return dateOfCreating;
+    public Date getCreatingDate() {
+        return creatingDate;
     }
 
-    public void setDateOfCreating(Calendar dateOfCreating) {
-        this.dateOfCreating = dateOfCreating;
+    public void setCreatingDate(Date creatingDate) {
+        this.creatingDate = creatingDate;
     }
 
     public Role getRole() {
@@ -102,6 +109,14 @@ public class User extends BaseEntity {
         this.comments = comments;
     }
 
+    public boolean isConfirmed() {
+        return isConfirmed;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        isConfirmed = confirmed;
+    }
+
     public List<GameObject> getGameObjects() {
         return gameObjects;
     }
@@ -109,4 +124,13 @@ public class User extends BaseEntity {
     public void setGameObjects(List<GameObject> gameObjects) {
         this.gameObjects = gameObjects;
     }
+
+    public Confirmation getConfirmation() {
+        return confirmation;
+    }
+
+    public void setConfirmation(Confirmation confirmation) {
+        this.confirmation = confirmation;
+    }
 }
+
