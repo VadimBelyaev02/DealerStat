@@ -1,6 +1,5 @@
 package com.leverx.dealerstat.service.impl;
 
-import com.leverx.dealerstat.dto.UserDTO;
 import com.leverx.dealerstat.exception.AlreadyExistsException;
 import com.leverx.dealerstat.exception.NotFoundException;
 import com.leverx.dealerstat.model.Role;
@@ -10,13 +9,11 @@ import com.leverx.dealerstat.repository.UsersRepository;
 import com.leverx.dealerstat.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UsersServiceImpl implements UsersService {
@@ -55,13 +52,8 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public Optional<UserDTO> findById(Long id) {
-//        if (!repository.existsById(id)) {
-//            return Optional.empty();
-//        }
-//        User user = repository.getById(id);
-//        return Optional.of(converter.convertToDTO(user));
-        return null;
+    public User findById(Long id) {
+        return repository.getById(id);
     }
 
     @Override
@@ -76,5 +68,12 @@ public class UsersServiceImpl implements UsersService {
         return repository.findByEmail(email).orElseThrow(() -> {
             throw new UsernameNotFoundException("User doesn't exist");
         });
+    }
+
+    @Override
+    public void recoverPassword(User user, String password) {
+        User userFromDB = repository.getById(user.getId());
+        userFromDB.setPassword(password);
+        repository.save(userFromDB);
     }
 }

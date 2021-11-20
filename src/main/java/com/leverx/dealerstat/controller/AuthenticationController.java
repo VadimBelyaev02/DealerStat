@@ -50,7 +50,7 @@ public class AuthenticationController {
 
             User user = usersService.findByEmail(requestDTO.getEmail());
             if (!user.isConfirmed()) {
-                throw new NotFoundException();
+                throw new NotFoundException("User is not found");
             }
 
             String token = tokenProvider.createToken(requestDTO.getEmail(), user.getRole().name());
