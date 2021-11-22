@@ -56,11 +56,11 @@ public class MailSenderServiceImpl implements MailSenderService {
         subject = "Password recovery";
         fullName = user.getFirstName() + " " + user.getLastName();
         toAddress = user.getEmail();
-        URL = siteURL + "/auth/reset?code=" + user.getConfirmation().getCode();
+        String code = user.getConfirmation().getCode();
 
         content = "Dear " + fullName + ",<br>"
-                + "Please click the link below to recover your password:<br>"
-                + "<a href=\"" + URL + "\">RECOVER</a><br>"
+                + "Here is your code to password recovering code:<br>"
+                + code + "<br>"
                 + "Thank you,<br>"
                 + senderName;
         sendMessage();

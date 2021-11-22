@@ -50,7 +50,7 @@ public class AuthenticationController {
 
             User user = usersService.findByEmail(requestDTO.getEmail());
             if (!user.isConfirmed()) {
-                throw new NotFoundException("User is not found");
+                throw new NotFoundException("User is not confirmed");
             }
 
             String token = tokenProvider.createToken(requestDTO.getEmail(), user.getRole().name());
@@ -63,7 +63,6 @@ public class AuthenticationController {
             return new ResponseEntity<>("Invalid email or password", HttpStatus.FORBIDDEN);
         }
     }
-
 
 
     @PostMapping("/logout")

@@ -4,14 +4,12 @@ import com.leverx.dealerstat.converter.UsersConverter;
 import com.leverx.dealerstat.dto.UserDTO;
 import com.leverx.dealerstat.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,19 +26,16 @@ public class UsersController {
 
 
     @GetMapping("/users")
-    public ResponseEntity<UserDTO> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> userDTOS = service.findAll().stream()
                 .map(converter::convertToDTO).collect(Collectors.toList());
-        return ResponseEntity.ok(userDTOS.get(0));
+        return ResponseEntity.ok(userDTOS);
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<List<UserDTO>> getUser(@PathVariable("id") Long id) {
-        Optional<UserDTO> userDTO = service.findById(id);
-        if (userDTO.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(null);
+    public ResponseEntity<UserDTO> getUser(@PathVariable("id") Long id) {
+        UserDTO userDTO = converter.convertToDTO(service.findById(id));
+        return ResponseEntity.ok(userDTO);
     }
 
 

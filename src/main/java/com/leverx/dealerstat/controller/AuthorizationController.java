@@ -60,4 +60,9 @@ public class AuthorizationController {
                                         @RequestParam("password") String newPassword) {
         return null;
     }
+
+    @GetMapping("/check_code")
+    public ResponseEntity<String> checkCode(@RequestParam String code) {
+        return ResponseEntity.ok(confirmationsService.checkCode(code));
+    }
 }
