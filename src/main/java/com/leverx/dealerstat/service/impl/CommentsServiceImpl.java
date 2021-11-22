@@ -1,6 +1,5 @@
 package com.leverx.dealerstat.service.impl;
 
-import com.leverx.dealerstat.converter.CommentsConverterImpl;
 import com.leverx.dealerstat.exception.NotFoundException;
 import com.leverx.dealerstat.model.Comment;
 import com.leverx.dealerstat.model.User;

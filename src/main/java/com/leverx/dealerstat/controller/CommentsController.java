@@ -1,65 +1,105 @@
 package com.leverx.dealerstat.controller;
 
+import com.leverx.dealerstat.converter.CommentsConverter;
+import com.leverx.dealerstat.converter.UsersConverter;
 import com.leverx.dealerstat.dto.CommentDTO;
+import com.leverx.dealerstat.dto.UserDTO;
 import com.leverx.dealerstat.model.Comment;
+import com.leverx.dealerstat.model.User;
 import com.leverx.dealerstat.service.CommentsService;
+import com.leverx.dealerstat.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class CommentsController {
 
-    private final CommentsService service;
+    private final UsersService usersService;
+    private final CommentsService commentsService;
+    private final CommentsConverter commentsConverter;
+    private final UsersConverter usersConverter;
 
     @Autowired
-    public CommentsController(CommentsService service) {
-        this.service = service;
+    public CommentsController(UsersService usersService,
+                              CommentsService commentsService,
+                              CommentsConverter commentsConverter,
+                              UsersConverter usersConverter) {
+        this.usersService = usersService;
+        this.commentsService = commentsService;
+        this.commentsConverter = commentsConverter;
+        this.usersConverter = usersConverter;
     }
 
     @GetMapping("/users/{id}/comments")
-    public ResponseEntity<List<CommentDTO>> listOfComments(@PathVariable("id") Long id) {
-        if (id == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        List<CommentDTO> comments = service.getComments(id);
-        //
-
-        return ResponseEntity.ok(comments);
+    public ResponseEntity<List<CommentDTO>> getUserComments(@PathVariable("id") Long id) {
+        List<CommentDTO> commentDTOS = commentsService.getComments(id).stream()
+                .map(commentsConverter::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(commentDTOS);
     }
 
-    @GetMapping("/users/{userId}/comments/{commentId}")
-    public ResponseEntity<CommentDTO> getComment(@PathVariable("userId") @NotNull Long userId,
-                                                 @PathVariable("commentId") @NotNull Long commentId) {
-
-
-        CommentDTO commentDTO = service.getComment(userId, commentId);
+    @GetMapping("/comments/{commentId}")
+    public ResponseEntity<CommentDTO> getComment(@PathVariable("commentId") Long commentId) {
+        CommentDTO commentDTO = commentsConverter.convertToDTO(commentsService.getComment(commentId));
         return ResponseEntity.ok(commentDTO);
     }
 
 
     @PostMapping("/articles/comments")
-    public ResponseEntity<CommentDTO> addComment(@Valid @RequestBody Comment comment) {
-        service.addComment(comment);
-        //return ResponseEntity.ok(comment);
+    public ResponseEntity<CommentDTO> addComment(@RequestBody CommentDTO commentDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+        User author = usersService.findByEmail(email);
+        commentDTO.setAuthorId(author.getId());
+        Comment comment = commentsConverter.convertToModel(commentDTO);
+        commentsService.addComment(comment);
         return null;
     }
 
-    @DeleteMapping("/users/comments")
-    public ResponseEntity<CommentDTO> deleteComment(@Valid @RequestBody Comment comment) {
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable("commentId") Long commentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String email = userDetails.getUsername();
+        Long userId = usersService.findByEmail(email).getId();
+
+        if (!commentsService.getAuthor(commentId).getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        commentsService.deleteComment(commentId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/articles/{id}/comments")
+    public ResponseEntity<CommentDTO> updateComment(@Valid @RequestBody CommentDTO commentDTO,
+                                                    @PathVariable("id") Long id) {
         return null;
     }
 
-    @PutMapping("/articles/comments")
-    public ResponseEntity<CommentDTO> updateComment(@Valid @RequestBody Comment comment) {
-        return null;
+    @GetMapping("/rating/{id}")
+    public ResponseEntity<Double> getTraderRating(@PathVariable("id") Long id) {
+        Double rate = commentsService.calculateRating(id);
+        return ResponseEntity.ok(rate);
     }
 
+    @GetMapping("/rating")
+    public ResponseEntity<Map<UserDTO, Double>> getAllRatings() {
+        Map<User, Double> rating = commentsService.calculateAllRating();
+        Map<UserDTO, Double> result = commentsService.calculateAllRating()
+                .keySet().stream().collect(Collectors.toMap(usersConverter::convertToDTO,
+                        rating::get));
+        return ResponseEntity.ok(result);
+    }
 
+//DELETE /users /:id/comments/:id - удалить, удалить может только автор отзыва
 
 }

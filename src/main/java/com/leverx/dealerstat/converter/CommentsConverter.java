@@ -2,25 +2,53 @@ package com.leverx.dealerstat.converter;
 
 import com.leverx.dealerstat.dto.CommentDTO;
 import com.leverx.dealerstat.model.Comment;
+import com.leverx.dealerstat.model.GameObject;
+import com.leverx.dealerstat.model.User;
+import com.leverx.dealerstat.service.GameObjectService;
+import com.leverx.dealerstat.service.UsersService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Component
 public class CommentsConverter {
 
+    private final UsersService usersService;
+
+    @Autowired
+    public CommentsConverter(UsersService usersService) {
+        this.usersService = usersService;
+    }
+
     public CommentDTO convertToDTO(final Comment comment) {
-        final Long id = comment.getId();
         final String message = comment.getMessage();
         final Float rate = comment.getRate();
-        final Date date = comment.getCreatingDate();
-        final boolean approved = comment.getApproved();
+        final Long authorId = comment.getAuthor().getId();
+        final Long userId = comment.getUser().getId();
         return CommentDTO.builder()
-                .id(id)
                 .message(message)
                 .rate(rate)
-                .creatingDate(date)
+                .authorId(authorId)
+                .userId(userId)
+                .build();
+    }
+
+    public Comment convertToModel(final CommentDTO commentDTO) {
+        final String message = commentDTO.getMessage();
+        final Float rate = commentDTO.getRate();
+        final User author = usersService.findById(commentDTO.getAuthorId());
+        final boolean approved = false;
+        final Date createdAt = new Date();
+        final User user = usersService.findById(commentDTO.getUserId());
+        return Comment.builder()
+                .message(message)
+                .rate(rate)
                 .approved(approved)
+                .creatingDate(createdAt)
+                .author(author)
+                .user(user)
                 .build();
     }
 }

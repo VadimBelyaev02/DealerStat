@@ -11,7 +11,7 @@ public class CommentDTO {
 
     private String message;
     private Float rate;
-    private Long gameObjectId;
+    private Long userId;
     private Long authorId;
 
 }
