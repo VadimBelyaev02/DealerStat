@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Builder
@@ -34,18 +35,15 @@ public class GameObject extends BaseEntity {
     @NotEmpty
     @CreatedDate
     @Column(name = "created_at")
-    private Calendar dateOfCreating;
+    private Date dateOfCreating;
 
     @Column(name = "updated_at")
     @LastModifiedDate
-    private Calendar dateOfUpdating;
+    private Date dateOfUpdating;
 
     @NotEmpty
     @Column(name = "price")
     private BigDecimal price;
-
-    @OneToMany(mappedBy = "gameObject", cascade = CascadeType.ALL)
-    private List<Comment> comments;
 
     @ManyToMany
     @JoinTable(name = "gameobject_game",
@@ -78,19 +76,19 @@ public class GameObject extends BaseEntity {
         this.author = author;
     }
 
-    public Calendar getDateOfCreating() {
+    public Date getDateOfCreating() {
         return dateOfCreating;
     }
 
-    public void setDateOfCreating(Calendar dateOfCreating) {
+    public void setDateOfCreating(Date dateOfCreating) {
         this.dateOfCreating = dateOfCreating;
     }
 
-    public Calendar getDateOfUpdating() {
+    public Date getDateOfUpdating() {
         return dateOfUpdating;
     }
 
-    public void setDateOfUpdating(Calendar dateOfUpdating) {
+    public void setDateOfUpdating(Date dateOfUpdating) {
         this.dateOfUpdating = dateOfUpdating;
     }
 
@@ -102,13 +100,7 @@ public class GameObject extends BaseEntity {
         this.price = price;
     }
 
-    public List<Comment> getComments() {
-        return comments;
-    }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
 
     public List<Game> getGames() {
         return games;

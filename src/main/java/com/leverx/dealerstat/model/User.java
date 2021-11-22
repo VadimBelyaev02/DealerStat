@@ -29,7 +29,7 @@ public class User extends BaseEntity {
     @Column(name = "hash_password")
     private String password;
 
-    @Email
+    @Email(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     @Column(name = "email")
     private String email;
 
@@ -41,8 +41,8 @@ public class User extends BaseEntity {
     @Column(name = "role")
     private Role role;
 
-    @OneToMany(mappedBy = "author")
-    private List<Comment> comments;
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Comment> authorsComments;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<GameObject> gameObjects;
@@ -50,8 +50,17 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Confirmation confirmation;
 
+    @OneToMany(mappedBy = "fromUser")
+    private List<Deal> dealsFrom;
+
+    @OneToMany(mappedBy = "toUser")
+    private List<Deal> dealsTo;
+
     @Column(name = "confirmed")
     private boolean isConfirmed;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Comment> comments;
 
     public String getFirstName() {
         return firstName;

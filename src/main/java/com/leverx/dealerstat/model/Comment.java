@@ -3,12 +3,10 @@ package com.leverx.dealerstat.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
-import java.util.Calendar;
 import java.util.Date;
 
 @Builder
@@ -23,12 +21,12 @@ public class Comment extends BaseEntity {
     private String message;
 
     @NotEmpty
-    @ManyToOne()
-    @JoinColumn(name = "gameobject_id")
-    private GameObject gameObject;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @NotEmpty
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;
 
@@ -53,12 +51,12 @@ public class Comment extends BaseEntity {
         this.message = message;
     }
 
-    public GameObject getGameObject() {
-        return gameObject;
+    public User getUser() {
+        return user;
     }
 
-    public void setGameObject(GameObject gameObject) {
-        this.gameObject = gameObject;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public User getAuthor() {
