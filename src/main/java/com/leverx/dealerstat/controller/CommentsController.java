@@ -94,9 +94,8 @@ public class CommentsController {
     @GetMapping("/rating")
     public ResponseEntity<Map<UserDTO, Double>> getAllRatings() {
         Map<User, Double> rating = commentsService.calculateAllRating();
-        Map<UserDTO, Double> result = commentsService.calculateAllRating()
-                .keySet().stream().collect(Collectors.toMap(usersConverter::convertToDTO,
-                        rating::get));
+        Map<UserDTO, Double> result = rating.keySet().stream()
+                .collect(Collectors.toMap(usersConverter::convertToDTO, rating::get));
         return ResponseEntity.ok(result);
     }
 
