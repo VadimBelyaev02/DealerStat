@@ -1,53 +1,78 @@
 package com.leverx.dealerstat.service.impl;
 
-import com.leverx.dealerstat.converter.CommentsConverter;
-import com.leverx.dealerstat.dto.CommentDTO;
+import com.leverx.dealerstat.converter.CommentsConverterImpl;
+import com.leverx.dealerstat.exception.NotFoundException;
 import com.leverx.dealerstat.model.Comment;
+import com.leverx.dealerstat.model.User;
 import com.leverx.dealerstat.repository.CommentsRepository;
 import com.leverx.dealerstat.service.CommentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Service
 public class CommentsServiceImpl implements CommentsService {
 
     private final CommentsRepository repository;
 
-    private final CommentsConverter converter;
-
     @Autowired
-    public CommentsServiceImpl(CommentsRepository repository, CommentsConverter converter) {
-        this.converter = converter;
+    public CommentsServiceImpl(CommentsRepository repository) {
         this.repository = repository;
     }
 
     @Override
-    public List<CommentDTO> getComments(Long userId) {
-//        Optional<List<Comment>> comments = repository.findAll();
-        return null;
+    public List<Comment> getComments(Long userId) {
+        return repository.findAllByAuthorId(userId).orElseThrow(() -> {
+            throw new NotFoundException("User is not found");
+        });
     }
 
     @Override
-    public CommentDTO getComment(Long userId, Long commentId) {
-        Optional<Comment> comment = repository.findByAuthorIdAndId(userId, commentId);
-        if (comment.isEmpty()) {
-            System.out.println("ploho");
-        }
-        return converter.convertToDTO(comment.get());
-        // return CommentDTO.toCommentDTO(comment);
-      //  return null;
+    public Comment getComment(Long commentId) {
+        return repository.findById(commentId).orElseThrow(() -> {
+            throw new NotFoundException("Comment is not found");
+        });
     }
 
     @Override
     public void deleteComment(Long commentId) {
-
+        repository.deleteById(commentId);
     }
 
     @Override
     public void addComment(Comment comment) {
+
         repository.save(comment);
+    }
+
+    @Override
+    public User getAuthor(Long commentId) {
+        Comment comment = repository.findById(commentId).orElseThrow(() -> {
+            throw new NotFoundException("Comment is not found");
+        });
+        return comment.getAuthor();
+    }
+
+    @Override
+    public Double calculateRating(Long userId) {
+        List<Comment> comments = repository.findAll();
+        if (comments.isEmpty()) {
+            throw new NotFoundException("User or user's rating can't be find");
+        }
+        return (comments.stream().mapToDouble(Comment::getRate).sum()) / (long) comments.size();
+    }
+
+    @Override
+    public Map<User, Double> calculateAllRating() {
+        List<Comment> comments = repository.findAll();
+      //  List<User> users = comments.stream().
+        return null;
+    }
+
+    @Override
+    public List<Comment> findAll() {
+        return repository.findAll();
     }
 }

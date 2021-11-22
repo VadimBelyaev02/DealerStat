@@ -76,4 +76,11 @@ public class UsersServiceImpl implements UsersService {
         userFromDB.setPassword(password);
         repository.save(userFromDB);
     }
+
+    @Override
+    public void becomeTrader(User user) {
+        User userFromDB = repository.getById(user.getId());
+        userFromDB.setRole(Role.TRADER);
+        repository.save(userFromDB);
+    }
 }

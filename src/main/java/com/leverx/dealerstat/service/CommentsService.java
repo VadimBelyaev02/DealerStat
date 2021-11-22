@@ -1,17 +1,27 @@
 package com.leverx.dealerstat.service;
 
-import com.leverx.dealerstat.dto.CommentDTO;
 import com.leverx.dealerstat.model.Comment;
+import com.leverx.dealerstat.model.User;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public interface CommentsService {
 
-    List<CommentDTO> getComments(Long userId);
+    List<Comment> getComments(Long userId);
 
-    CommentDTO getComment(Long userId, Long commentId);
+    Comment getComment(Long commentId);
 
     void deleteComment(Long commentId);
 
     void addComment(Comment comment);
+
+    User getAuthor(Long commentId);
+
+    Double calculateRating(Long userId);
+
+    Map<User, Double> calculateAllRating();
+
+    List<Comment> findAll();
 }

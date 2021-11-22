@@ -18,5 +18,7 @@ public interface UsersService {
     User findByEmail(String email) throws NotFoundException;
 
     void recoverPassword(User user, String password);
+
+    void becomeTrader(User user);
 }
 

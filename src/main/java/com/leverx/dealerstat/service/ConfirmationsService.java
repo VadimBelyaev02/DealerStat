@@ -6,4 +6,6 @@ public interface ConfirmationsService {
     void save(User userEntity);
 
     User findUserByCode(String code);
+
+    String checkCode(String code);
 }
