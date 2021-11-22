@@ -10,12 +10,9 @@ import java.util.Date;
 @Builder
 public class GameObjectDTO {
 
-    private Long id;
     private String title;
     private String description;
-    private UserDTO author;
-    private Date dateOfCreating;
-    private Date dateOfUpdating;
+    private Long authorId;
     private BigDecimal price;
 
 }
