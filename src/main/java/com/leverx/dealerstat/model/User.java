@@ -17,15 +17,12 @@ import java.util.List;
 @Table(name = "users")
 public class User extends BaseEntity {
 
-    @NotEmpty
     @Column(name = "first_name")
     private String firstName;
 
-    @NotEmpty
     @Column(name = "last_name")
     private String lastName;
 
-    @NotEmpty
     @Column(name = "hash_password")
     private String password;
 

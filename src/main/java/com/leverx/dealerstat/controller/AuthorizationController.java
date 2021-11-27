@@ -44,7 +44,7 @@ public class AuthorizationController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/forgot_password/confirm")
+    @PostMapping("/reset")
     public ResponseEntity<?> confirmRecovering(@RequestParam("code") String code,
                                                @RequestParam("newPassword") String password) {
         User user = confirmationsService.findUserByCode(code);
@@ -53,12 +53,6 @@ public class AuthorizationController {
         }
         usersService.recoverPassword(user, password);
         return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/reset")
-    public ResponseEntity resetPassword(@RequestParam("code") String code,
-                                        @RequestParam("password") String newPassword) {
-        return null;
     }
 
     @GetMapping("/check_code")

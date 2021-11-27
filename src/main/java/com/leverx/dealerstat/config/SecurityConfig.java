@@ -2,6 +2,7 @@ package com.leverx.dealerstat.config;
 
 import com.leverx.dealerstat.model.Permission;
 import com.leverx.dealerstat.security.JwtConfigurer;
+import com.leverx.dealerstat.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -35,16 +37,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/users").hasAuthority(Permission.READ.getPermission())
-                .antMatchers(HttpMethod.POST, "/users").hasAuthority(Permission.WRITE.getPermission())
                 .antMatchers(HttpMethod.GET, "/auth/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/register").permitAll()
-                .antMatchers(HttpMethod.POST, "/logout").authenticated()
+                .antMatchers(HttpMethod.GET, "/games").permitAll()
+                .antMatchers(HttpMethod.GET, "/comments/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/users/{id}/comments").permitAll()
+                .antMatchers(HttpMethod.GET, "/objects/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/comments").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/comments/{commentId}").authenticated()
+                .antMatchers(HttpMethod.PUT, "/comments/{id}").authenticated()
+                .antMatchers(HttpMethod.GET, "/rating/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/objects").hasAuthority(Permission.TRADE.getPermission())
+                .antMatchers(HttpMethod.PUT, "/objects/{id}").hasAuthority(Permission.TRADE.getPermission())
+                .antMatchers(HttpMethod.PUT, "/games/{id}").hasAuthority(Permission.WRITE.getPermission())
+                .antMatchers(HttpMethod.POST, "/games").hasAuthority(Permission.WRITE.getPermission())
+                .antMatchers(HttpMethod.PUT, "/become_trader").authenticated()
+                .antMatchers(HttpMethod.GET, "/comments/unapproved").hasAuthority(Permission.WRITE.getPermission())
+                .antMatchers(HttpMethod.POST, "/comments/approve").hasAuthority(Permission.WRITE.getPermission())
                 .anyRequest()
                 .authenticated()
                 .and()
-                .apply(jwtConfigurer);
-
+                .apply(jwtConfigurer)
+                .and()
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID");
+                //.logoutSuccessUrl("/login");
     }
 
     @Bean
@@ -57,5 +78,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
+
 
 }
