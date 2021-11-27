@@ -6,13 +6,21 @@ import com.leverx.dealerstat.dto.CommentDTO;
 import com.leverx.dealerstat.dto.UserDTO;
 import com.leverx.dealerstat.model.Comment;
 import com.leverx.dealerstat.model.User;
+import com.leverx.dealerstat.security.AuthenticatedUserFactory;
 import com.leverx.dealerstat.service.CommentsService;
 import com.leverx.dealerstat.service.UsersService;
+import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,16 +35,19 @@ public class CommentsController {
     private final CommentsService commentsService;
     private final CommentsConverter commentsConverter;
     private final UsersConverter usersConverter;
+    private final AuthenticatedUserFactory userFactory;
 
     @Autowired
     public CommentsController(UsersService usersService,
                               CommentsService commentsService,
                               CommentsConverter commentsConverter,
-                              UsersConverter usersConverter) {
+                              UsersConverter usersConverter,
+                              AuthenticatedUserFactory userFactory) {
         this.usersService = usersService;
         this.commentsService = commentsService;
         this.commentsConverter = commentsConverter;
         this.usersConverter = usersConverter;
+        this.userFactory = userFactory;
     }
 
     @GetMapping("/users/{id}/comments")
@@ -52,25 +63,35 @@ public class CommentsController {
         return ResponseEntity.ok(commentDTO);
     }
 
+//    @GetMapping("/rating/{sortBy}")
+//    public ResponseEntity<?> getAllComments(
+//            @QuerydslPredicate(root = Comment.class)Predicate predicate,
+//            @PathVariable("sortBy") String sortBy,
+//            Pageable pageable) {
+//        Sort sort = pageable.getSort();
+//        if (sort == null) {
+//            return null;
+//        }
+//      //  pageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort);
+//
+//        List<CommentDTO> commentDTOS = commentsService.findAll().stream()
+//                .map(commentsConverter::convertToDTO).collect(Collectors.toList());
+//        return ResponseEntity.ok(commentDTOS);
+//    }
 
-    @PostMapping("/articles/comments")
-    public ResponseEntity<CommentDTO> addComment(@RequestBody CommentDTO commentDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String email = userDetails.getUsername();
-        User author = usersService.findByEmail(email);
+
+    @PostMapping("/comments")
+    public ResponseEntity<?> addComment(@RequestBody CommentDTO commentDTO) {
+        User author = userFactory.currentUser();
         commentDTO.setAuthorId(author.getId());
         Comment comment = commentsConverter.convertToModel(commentDTO);
         commentsService.addComment(comment);
-        return null;
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable("commentId") Long commentId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String email = userDetails.getUsername();
-        Long userId = usersService.findByEmail(email).getId();
+        Long userId = userFactory.currentUser().getId();
 
         if (!commentsService.getAuthor(commentId).getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -79,26 +100,43 @@ public class CommentsController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/articles/{id}/comments")
-    public ResponseEntity<CommentDTO> updateComment(@Valid @RequestBody CommentDTO commentDTO,
+    @PutMapping("/comments/{id}")
+    public ResponseEntity<?> updateComment(@RequestBody CommentDTO commentDTO,
                                                     @PathVariable("id") Long id) {
-        return null;
+        Long userId = userFactory.currentUser().getId();
+
+        if (!commentsService.getAuthor(id).getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        commentDTO.setAuthorId(userId);
+        commentsService.updateComment(commentsConverter.convertToModel(commentDTO), id);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/rating/{id}")
+    @GetMapping("/users/{id}/rating")
     public ResponseEntity<Double> getTraderRating(@PathVariable("id") Long id) {
         Double rate = commentsService.calculateRating(id);
         return ResponseEntity.ok(rate);
     }
 
-    @GetMapping("/rating")
-    public ResponseEntity<Map<UserDTO, Double>> getAllRatings() {
+    @GetMapping("/rating/{sortBy}")
+    public ResponseEntity<Map<UserDTO, Double>> getAllRatings(@PathVariable("sortBy") String sortBy) {
         Map<User, Double> rating = commentsService.calculateAllRating();
         Map<UserDTO, Double> result = rating.keySet().stream()
                 .collect(Collectors.toMap(usersConverter::convertToDTO, rating::get));
         return ResponseEntity.ok(result);
     }
 
-//DELETE /users /:id/comments/:id - удалить, удалить может только автор отзыва
+    @GetMapping("/comments/unapproved")
+    public ResponseEntity<List<CommentDTO>> getUnapprovedComments() {
+        List<CommentDTO> commentDTOS = commentsService.getUnapprovedComments()
+                .stream().map(commentsConverter::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(commentDTOS);
+    }
 
+    @PostMapping("/comments/approve")
+    public ResponseEntity<?> approveComment(@RequestParam("id") Long commentId) {
+        commentsService.approveComment(commentId);
+        return ResponseEntity.ok().build();
+    }
 }

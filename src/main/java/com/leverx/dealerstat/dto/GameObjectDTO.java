@@ -13,6 +13,7 @@ public class GameObjectDTO {
     private String title;
     private String description;
     private Long authorId;
+    private Long gameId;
     private BigDecimal price;
 
 }

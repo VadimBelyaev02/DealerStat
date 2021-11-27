@@ -20,19 +20,16 @@ import java.util.List;
 @Table(name = "game_objects")
 public class GameObject extends BaseEntity {
 
-    @NotEmpty
     @Column(name = "title")
     private String title;
 
     @Column(name = "description")
     private String description;
 
-    @NotEmpty
     @ManyToOne()
     @JoinColumn(name = "author_id")
     private User author;
 
-    @NotEmpty
     @CreatedDate
     @Column(name = "created_at")
     private Date dateOfCreating;
@@ -41,7 +38,6 @@ public class GameObject extends BaseEntity {
     @LastModifiedDate
     private Date dateOfUpdating;
 
-    @NotEmpty
     @Column(name = "price")
     private BigDecimal price;
 

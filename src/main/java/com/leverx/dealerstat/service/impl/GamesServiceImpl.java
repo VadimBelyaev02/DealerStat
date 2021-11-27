@@ -1,5 +1,7 @@
 package com.leverx.dealerstat.service.impl;
 
+import com.leverx.dealerstat.exception.AlreadyExistsException;
+import com.leverx.dealerstat.exception.NotFoundException;
 import com.leverx.dealerstat.model.Game;
 import com.leverx.dealerstat.repository.GamesRepository;
 import com.leverx.dealerstat.service.GamesService;
@@ -26,5 +28,19 @@ public class GamesServiceImpl implements GamesService {
     @Override
     public Game save(Game game) {
         return repository.save(game);
+    }
+
+    @Override
+    public void update(Game game, Long id) {
+        if (repository.existsByName(game.getName())) {
+            throw new AlreadyExistsException("The game already exists");
+        }
+
+        Game gameFromDB = repository.findById(id).orElseThrow(() -> {
+            throw new NotFoundException("Game is not found");
+        });
+        gameFromDB.setName(game.getName());
+        //gameFromDB.set
+        // fuck i am so tired. i'll do it as soon as i'll be able
     }
 }

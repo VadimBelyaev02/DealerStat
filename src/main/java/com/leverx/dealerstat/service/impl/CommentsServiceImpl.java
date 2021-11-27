@@ -8,8 +8,7 @@ import com.leverx.dealerstat.service.CommentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CommentsServiceImpl implements CommentsService {
@@ -42,7 +41,6 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     public void addComment(Comment comment) {
-
         repository.save(comment);
     }
 
@@ -65,13 +63,43 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     public Map<User, Double> calculateAllRating() {
-        List<Comment> comments = repository.findAll();
-      //  List<User> users = comments.stream().
+   //     List<Comment> comments = repository.findTopByRate().orElseThrow(() -> {
+    //        throw new NotFoundException("a");
+     //   });
+     //   Map<User, Double> rating = new TreeMap<>((a, b) -> a - b);
+
         return null;
     }
 
     @Override
     public List<Comment> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public void updateComment(Comment comment, Long id) {
+        Comment commentFromDB = repository.findById(id).orElse(null);
+        if (commentFromDB == null || !commentFromDB.getApproved()) {
+            throw new NotFoundException("Comment is not found or is not approved");
+        }
+        commentFromDB.setMessage(comment.getMessage());
+        commentFromDB.setRate(comment.getRate());
+        repository.save(commentFromDB);
+    }
+
+    @Override
+    public List<Comment> getUnapprovedComments() {
+        return repository.findAllByApproved(false).orElseThrow(() -> {
+            throw new NotFoundException("No one comment was found");
+        });
+    }
+
+    @Override
+    public void approveComment(Long commentId) {
+        Comment commentFromDB = repository.findById(commentId).orElseThrow(() -> {
+            throw new NotFoundException("Comment is not found");
+        });
+        commentFromDB.setApproved(true);
+        repository.save(commentFromDB);
     }
 }

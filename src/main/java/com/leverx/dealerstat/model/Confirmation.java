@@ -15,7 +15,6 @@ import java.util.Date;
 @Table(name = "confirmations")
 public class Confirmation extends BaseEntity{
 
-    @NotEmpty
     @Column(name = "hash_code")
     private String code;
 

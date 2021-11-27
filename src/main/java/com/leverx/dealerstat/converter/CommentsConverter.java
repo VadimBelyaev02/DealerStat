@@ -24,7 +24,7 @@ public class CommentsConverter {
 
     public CommentDTO convertToDTO(final Comment comment) {
         final String message = comment.getMessage();
-        final Float rate = comment.getRate();
+        final Double rate = comment.getRate();
         final Long authorId = comment.getAuthor().getId();
         final Long userId = comment.getUser().getId();
         return CommentDTO.builder()
@@ -37,10 +37,10 @@ public class CommentsConverter {
 
     public Comment convertToModel(final CommentDTO commentDTO) {
         final String message = commentDTO.getMessage();
-        final Float rate = commentDTO.getRate();
+        final Double rate = commentDTO.getRate();
         final User author = usersService.findById(commentDTO.getAuthorId());
         final boolean approved = false;
-        final Date createdAt = new Date();
+        final Date createdAt = commentDTO.getCreatedAt() == null ? new Date() : commentDTO.getCreatedAt();
         final User user = usersService.findById(commentDTO.getUserId());
         return Comment.builder()
                 .message(message)

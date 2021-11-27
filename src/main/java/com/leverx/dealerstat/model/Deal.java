@@ -16,7 +16,6 @@ import java.util.Date;
 @Table(name = "deals")
 public class Deal extends BaseEntity{
 
-    @NotEmpty
     @Column(name = "date")
     private Date date;
 
@@ -27,4 +26,28 @@ public class Deal extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "to_id")
     private User toUser;
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public User getFromUser() {
+        return fromUser;
+    }
+
+    public void setFromUser(User fromUser) {
+        this.fromUser = fromUser;
+    }
+
+    public User getToUser() {
+        return toUser;
+    }
+
+    public void setToUser(User toUser) {
+        this.toUser = toUser;
+    }
 }

@@ -15,7 +15,6 @@ import java.util.List;
 @Table(name = "games")
 public class Game extends BaseEntity{
 
-    @NotEmpty
     @Column(name = "name")
     private String name;
 

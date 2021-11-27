@@ -9,4 +9,6 @@ public interface GamesService {
     List<Game> findAll();
 
     Game save(Game convertToModel);
+
+    void update(Game game, Long id);
 }

@@ -3,8 +3,11 @@ package com.leverx.dealerstat.controller;
 import com.leverx.dealerstat.converter.GamesConverter;
 import com.leverx.dealerstat.dto.GameDTO;
 import com.leverx.dealerstat.model.Game;
+import com.leverx.dealerstat.model.User;
+import com.leverx.dealerstat.security.AuthenticatedUserFactory;
 import com.leverx.dealerstat.service.GamesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,11 +19,14 @@ public class GamesController {
 
     private final GamesService gamesService;
     private final GamesConverter converter;
+    private final AuthenticatedUserFactory userFactory;
 
     @Autowired
-    public GamesController(GamesService gamesService, GamesConverter converter) {
+    public GamesController(GamesService gamesService, GamesConverter converter,
+                           AuthenticatedUserFactory userFactory) {
         this.gamesService = gamesService;
         this.converter = converter;
+        this.userFactory = userFactory;
     }
 
     @GetMapping("/games")
@@ -39,8 +45,7 @@ public class GamesController {
     @PutMapping("/games/{id}")
     public ResponseEntity<?> updateGame(@RequestBody GameDTO gameDTO,
                                         @PathVariable("id") Long id) {
-        // get authorities to update. Is it the user that has the game?
-      //  gamesService.update(converter.convertToModel(gameDTO));
+        gamesService.update(converter.convertToModel(gameDTO), id);
         return ResponseEntity.ok().build();
     }
 

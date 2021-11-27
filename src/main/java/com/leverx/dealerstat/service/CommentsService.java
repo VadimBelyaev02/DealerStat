@@ -1,5 +1,6 @@
 package com.leverx.dealerstat.service;
 
+import com.leverx.dealerstat.dto.CommentDTO;
 import com.leverx.dealerstat.model.Comment;
 import com.leverx.dealerstat.model.User;
 
@@ -24,4 +25,10 @@ public interface CommentsService {
     Map<User, Double> calculateAllRating();
 
     List<Comment> findAll();
+
+    void updateComment(Comment comment, Long id);
+
+    List<Comment> getUnapprovedComments();
+
+    void approveComment(Long commentId);
 }

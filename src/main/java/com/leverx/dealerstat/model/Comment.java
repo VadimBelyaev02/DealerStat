@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
 import java.util.Date;
@@ -16,32 +18,28 @@ import java.util.Date;
 @Table(name = "comments")
 public class Comment extends BaseEntity {
 
-    @NotEmpty
     @Column(name = "message")
     private String message;
 
-    @NotEmpty
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NotEmpty
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;
 
-    @NotEmpty
     @Column(name = "created_at")
     @Temporal(TemporalType.DATE)
     private Date creatingDate;
 
-    @NotEmpty
     @Column(name = "approved")
     private Boolean approved;
 
-    @NotEmpty
+    @Min(1)
+    @Max(5)
     @Column(name = "rate")
-    private Float rate;
+    private Double rate;
 
     public String getMessage() {
         return message;
@@ -83,11 +81,11 @@ public class Comment extends BaseEntity {
         this.approved = approved;
     }
 
-    public Float getRate() {
+    public Double getRate() {
         return rate;
     }
 
-    public void setRate(Float rate) {
+    public void setRate(Double rate) {
         this.rate = rate;
     }
 }
