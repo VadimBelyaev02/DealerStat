@@ -35,7 +35,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public void save(User user) throws AlreadyExistsException {
         if (repository.existsByEmail(user.getEmail())) {
-            throw new AlreadyExistsException();
+            throw new AlreadyExistsException("The user already exists");
         }
 
         user.setPassword(encoder.encode(user.getPassword()));
@@ -53,7 +53,9 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public User findById(Long id) {
-        return repository.getById(id);
+        return repository.findById(id).orElseThrow(() -> {
+            throw new NotFoundException("User is not found");
+        });
     }
 
     @Override
