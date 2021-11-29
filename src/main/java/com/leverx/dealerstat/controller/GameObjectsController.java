@@ -3,6 +3,7 @@ package com.leverx.dealerstat.controller;
 import com.leverx.dealerstat.converter.GameObjectsConverter;
 import com.leverx.dealerstat.dto.GameObjectDTO;
 import com.leverx.dealerstat.model.User;
+import com.leverx.dealerstat.security.AuthenticatedUserFactory;
 import com.leverx.dealerstat.service.GameObjectService;
 import com.leverx.dealerstat.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,29 +22,35 @@ public class GameObjectsController {
     private final GameObjectsConverter gameObjectsConverter;
     private final UsersService usersService;
     private final GameObjectService gameObjectService;
+    private final AuthenticatedUserFactory userFactory;
 
     @Autowired
     public GameObjectsController(GameObjectsConverter gameObjectsConverter,
                                  UsersService usersService,
-                                 GameObjectService gameObjectService) {
+                                 GameObjectService gameObjectService,
+                                 AuthenticatedUserFactory userFactory) {
         this.gameObjectsConverter = gameObjectsConverter;
         this.usersService = usersService;
         this.gameObjectService = gameObjectService;
+        this.userFactory = userFactory;
     }
 
 
     @PutMapping("/objects/{id}")
     public ResponseEntity<GameObjectDTO> editGameObject(@RequestBody GameObjectDTO gameObject,
                                                         @PathVariable("id") Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String email = userDetails.getUsername();
-        User user = usersService.findByEmail(email);
+        User user = userFactory.currentUser();
         if (!gameObjectService.findById(id).getAuthor().getId().equals(user.getId())) {
             return ResponseEntity.notFound().build();
         }
-     //   gameObjectService.update(gameObjectsConverter.convertToModel(gameObject));
+        gameObjectService.update(gameObjectsConverter.convertToModel(gameObject), id);
         return null;
+    }
+
+    @GetMapping("/objects/{id}")
+    public ResponseEntity<GameObjectDTO> getGameObject(@PathVariable("id") Long id) {
+        GameObjectDTO gameObjectDTO = gameObjectsConverter.convertToDTO(gameObjectService.findById(id));
+        return ResponseEntity.ok(gameObjectDTO);
     }
 
     @PostMapping("/objects")
@@ -61,10 +68,7 @@ public class GameObjectsController {
 
     @GetMapping("/objects/my")
     public ResponseEntity<List<GameObjectDTO>> getAuthorizedUserGameObjects() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String email = userDetails.getUsername();
-        User user = usersService.findByEmail(email);
+       User user = userFactory.currentUser();
         List<GameObjectDTO> gameObjectDTOS = gameObjectService.findAllByAuthorId(user.getId())
                 .stream().map(gameObjectsConverter::convertToDTO).collect(Collectors.toList());
         return ResponseEntity.ok(gameObjectDTOS);

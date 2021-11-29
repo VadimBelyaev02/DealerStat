@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentsServiceImpl implements CommentsService {
@@ -22,9 +23,7 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     public List<Comment> getComments(Long userId) {
-        return repository.findAllByAuthorId(userId).orElseThrow(() -> {
-            throw new NotFoundException("User is not found");
-        });
+        return repository.findAllByAuthorId(userId);
     }
 
     @Override
@@ -54,22 +53,34 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     public Double calculateRating(Long userId) {
-        List<Comment> comments = repository.findAll();
-        if (comments.isEmpty()) {
-            throw new NotFoundException("User or user's rating can't be find");
-        }
-        return (comments.stream().mapToDouble(Comment::getRate).sum()) / (long) comments.size();
+        List<Comment> comments = repository.findAllByUserId(userId);
+        //  Double rateSum = 0D;?
+        return (comments.stream().map(Comment::getRate).reduce(0D, Double::sum))
+                / (long) comments.size();
     }
 
     @Override
     public Map<User, Double> calculateAllRating() {
-   //     List<Comment> comments = repository.findTopByRate().orElseThrow(() -> {
-    //        throw new NotFoundException("a");
-     //   });
-     //   Map<User, Double> rating = new TreeMap<>((a, b) -> a - b);
-
-        return null;
-    }
+        List<Comment> comments = repository.findAll();
+        Map<User, Integer> countOfRates = new HashMap<>();
+        Map<User, Double> rating = new HashMap<>();
+        for (Comment comment : comments) {
+            User user = comment.getUser();
+            if (rating.containsKey(user)) {
+                rating.put(user, rating.get(user) + comment.getRate());
+                countOfRates.put(user, countOfRates.get(user) + 1);
+            } else {
+                rating.put(user, comment.getRate());
+                countOfRates.put(user, 1);
+            }
+        }
+        for (Map.Entry<User, Double> entry : rating.entrySet()) {
+            entry.setValue(entry.getValue() / countOfRates.get(entry.getKey()));
+        }
+        return rating;
+       // Map<User, Double> newrate = rating.entrySet().stream()//.map(a -> a.setValue(rating.get(a) / countOfRates.get(a)))
+       //         .collect(Collectors.toMap(k -> k.getKey(), v -> v.setValue(rating.get(Map.Entry::getKey)));
+    }//usersConverter::convertToDTO, rating::get
 
     @Override
     public List<Comment> findAll() {
@@ -89,9 +100,7 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     public List<Comment> getUnapprovedComments() {
-        return repository.findAllByApproved(false).orElseThrow(() -> {
-            throw new NotFoundException("No one comment was found");
-        });
+        return repository.findAllByApproved(false);
     }
 
     @Override

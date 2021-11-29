@@ -12,4 +12,6 @@ public interface GameObjectService {
     void save(GameObject gameObject);
 
     List<GameObject> findAllByAuthorId(Long id);
+
+    void update(GameObject gameObject, Long id);
 }

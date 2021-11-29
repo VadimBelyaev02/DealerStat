@@ -54,7 +54,7 @@ public class AuthenticationController {
             }
 
             String token = tokenProvider.createToken(requestDTO.getEmail(), user.getRole().name());
-            Map<Object, Object> response = new HashMap<>();
+            Map<String, String> response = new HashMap<>();
             response.put("email", requestDTO.getEmail());
             response.put("token", token);
 
