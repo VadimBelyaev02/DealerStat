@@ -11,11 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
-@Service
+@Service("userServiceImpl")
 public class UsersServiceImpl implements UsersService {
 
     private final UsersRepository repository;
@@ -33,6 +34,7 @@ public class UsersServiceImpl implements UsersService {
 
 
     @Override
+    @Transactional
     public void save(User user) throws AlreadyExistsException {
         if (repository.existsByEmail(user.getEmail())) {
             throw new AlreadyExistsException("The user already exists");
@@ -47,11 +49,13 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
+    @Transactional
     public List<User> findAll() {
         return repository.findAll();
     }
 
     @Override
+    @Transactional
     public User findById(Long id) {
         return repository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("User is not found");
@@ -59,13 +63,16 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
+    @Transactional
     public void confirm(User user) {
         User userFromDB = repository.getById(user.getId());
         userFromDB.setConfirmed(true);
         repository.save(userFromDB);
+        confirmationsRepository.deleteByUserId(user.getId());
     }
 
     @Override
+    @Transactional
     public User findByEmail(String email) throws NotFoundException {
         return repository.findByEmail(email).orElseThrow(() -> {
             throw new UsernameNotFoundException("User doesn't exist");
@@ -73,13 +80,16 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
+    @Transactional
     public void recoverPassword(User user, String password) {
         User userFromDB = repository.getById(user.getId());
-        userFromDB.setPassword(password);
+        userFromDB.setPassword(encoder.encode(password));
         repository.save(userFromDB);
+        confirmationsRepository.deleteByUserId(user.getId());
     }
 
     @Override
+    @Transactional
     public void becomeTrader(User user) {
         User userFromDB = repository.getById(user.getId());
         userFromDB.setRole(Role.TRADER);

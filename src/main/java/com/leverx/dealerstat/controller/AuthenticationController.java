@@ -1,21 +1,22 @@
 package com.leverx.dealerstat.controller;
 
 import com.leverx.dealerstat.dto.AuthenticationRequestDTO;
-import com.leverx.dealerstat.dto.UserDTO;
 import com.leverx.dealerstat.exception.NotFoundException;
 import com.leverx.dealerstat.model.User;
 import com.leverx.dealerstat.security.JwtTokenProvider;
 import com.leverx.dealerstat.service.ConfirmationsService;
 import com.leverx.dealerstat.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +34,7 @@ public class AuthenticationController {
     @Autowired
     public AuthenticationController(AuthenticationManager authenticationManager,
                                     ConfirmationsService confirmationsService,
-                                    UsersService usersService,
+                                    @Qualifier("userServiceImpl") UsersService usersService,
                                     JwtTokenProvider tokenProvider) {
         this.authenticationManager = authenticationManager;
         this.confirmationsService = confirmationsService;

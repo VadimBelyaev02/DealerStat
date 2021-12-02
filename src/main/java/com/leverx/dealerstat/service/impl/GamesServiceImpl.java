@@ -7,6 +7,7 @@ import com.leverx.dealerstat.repository.GamesRepository;
 import com.leverx.dealerstat.service.GamesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,16 +22,19 @@ public class GamesServiceImpl implements GamesService {
     }
 
     @Override
+    @Transactional
     public List<Game> findAll() {
         return repository.findAll();
     }
 
     @Override
+    @Transactional
     public Game save(Game game) {
         return repository.save(game);
     }
 
     @Override
+    @Transactional
     public void update(Game game, Long id) {
         if (repository.existsByName(game.getName())) {
             throw new AlreadyExistsException("The game already exists");
@@ -40,7 +44,6 @@ public class GamesServiceImpl implements GamesService {
             throw new NotFoundException("Game is not found");
         });
         gameFromDB.setName(game.getName());
-        //gameFromDB.set
-        // fuck i am so tired. i'll do it as soon as i'll be able
+        repository.save(gameFromDB);
     }
 }

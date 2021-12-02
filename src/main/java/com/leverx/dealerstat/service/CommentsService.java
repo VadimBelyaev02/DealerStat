@@ -22,7 +22,7 @@ public interface CommentsService {
 
     Double calculateRating(Long userId);
 
-    Map<User, Double> calculateAllRating();
+    Map<User, Double> calculateAllRating(Boolean ascending);
 
     List<Comment> findAll();
 

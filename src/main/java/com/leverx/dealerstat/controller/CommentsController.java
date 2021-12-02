@@ -9,23 +9,14 @@ import com.leverx.dealerstat.model.User;
 import com.leverx.dealerstat.security.AuthenticatedUserFactory;
 import com.leverx.dealerstat.service.CommentsService;
 import com.leverx.dealerstat.service.UsersService;
-import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.querydsl.binding.QuerydslPredicate;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,7 +29,7 @@ public class CommentsController {
     private final AuthenticatedUserFactory userFactory;
 
     @Autowired
-    public CommentsController(UsersService usersService,
+    public CommentsController(@Qualifier("userServiceImpl") UsersService usersService,
                               CommentsService commentsService,
                               CommentsConverter commentsConverter,
                               UsersConverter usersConverter,
@@ -83,6 +74,9 @@ public class CommentsController {
     @PostMapping("/comments")
     public ResponseEntity<?> addComment(@RequestBody CommentDTO commentDTO) {
         User author = userFactory.currentUser();
+        if (commentDTO.getUserId().equals(author.getId())) {
+            return new ResponseEntity<>("You can't comment yourself!", HttpStatus.FORBIDDEN);
+        }
         commentDTO.setAuthorId(author.getId());
         Comment comment = commentsConverter.convertToModel(commentDTO);
         commentsService.addComment(comment);
@@ -119,9 +113,9 @@ public class CommentsController {
         return ResponseEntity.ok(rate);
     }
 
-    @GetMapping("/rating/{sortBy}")
-    public ResponseEntity<Map<UserDTO, Double>> getAllRatings(@PathVariable("sortBy") String sortBy) {
-        Map<User, Double> rating = commentsService.calculateAllRating();
+    @GetMapping("/rating")
+    public ResponseEntity<Map<UserDTO, Double>> getAllRatings(@RequestParam("sort") Boolean ascending) {
+        Map<User, Double> rating = commentsService.calculateAllRating(ascending);
         Map<UserDTO, Double> result = rating.keySet().stream()
                 .collect(Collectors.toMap(usersConverter::convertToDTO, rating::get));
         return ResponseEntity.ok(result);

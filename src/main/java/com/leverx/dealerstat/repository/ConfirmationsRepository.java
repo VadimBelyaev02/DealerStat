@@ -12,4 +12,8 @@ import java.util.Optional;
 public interface ConfirmationsRepository extends JpaRepository<Confirmation, Long> {
 
     Optional<Confirmation> findByCode(String code);
+
+    boolean existsByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }

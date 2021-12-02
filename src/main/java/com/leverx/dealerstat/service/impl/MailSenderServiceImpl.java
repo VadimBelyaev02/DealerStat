@@ -21,7 +21,7 @@ public class MailSenderServiceImpl implements MailSenderService {
     private final JavaMailSender mailSender;
     private final MimeMessage message;
     private final MimeMessageHelper helper;
-    private final String siteURL = "http://localhost";
+    private final String siteURL = "http://localhost:8080";
     private final String senderName = "DealerStat";
     private String subject;
     private String fullName;

@@ -6,6 +6,7 @@ import com.leverx.dealerstat.repository.GameObjectsRepository;
 import com.leverx.dealerstat.service.GameObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ public class GameObjectServiceImpl implements GameObjectService {
     }
 
     @Override
+    @Transactional
     public GameObject findById(Long gameObjectId) {
         return repository.findById(gameObjectId).orElseThrow(() -> {
             throw new NotFoundException("Game object is not found");
@@ -28,21 +30,25 @@ public class GameObjectServiceImpl implements GameObjectService {
     }
 
     @Override
+    @Transactional
     public List<GameObject> findAll() {
         return repository.findAll();
     }
 
     @Override
+    @Transactional
     public void save(GameObject gameObject) {
         repository.save(gameObject);
     }
 
     @Override
+    @Transactional
     public List<GameObject> findAllByAuthorId(Long id) {
         return repository.findAllByAuthorId(id);
     }
 
     @Override
+    @Transactional
     public void update(GameObject gameObject, Long id) {
         GameObject gameObjectFromDB = repository.findById(id).orElseThrow(() -> {
             throw new NotFoundException("Game object is not found");

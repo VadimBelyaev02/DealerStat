@@ -7,6 +7,7 @@ import com.leverx.dealerstat.repository.CommentsRepository;
 import com.leverx.dealerstat.service.CommentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,11 +23,13 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
     @Override
+    @Transactional
     public List<Comment> getComments(Long userId) {
         return repository.findAllByAuthorId(userId);
     }
 
     @Override
+    @Transactional
     public Comment getComment(Long commentId) {
         return repository.findById(commentId).orElseThrow(() -> {
             throw new NotFoundException("Comment is not found");
@@ -34,16 +37,19 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
     @Override
+    @Transactional
     public void deleteComment(Long commentId) {
         repository.deleteById(commentId);
     }
 
     @Override
+    @Transactional
     public void addComment(Comment comment) {
         repository.save(comment);
     }
 
     @Override
+    @Transactional
     public User getAuthor(Long commentId) {
         Comment comment = repository.findById(commentId).orElseThrow(() -> {
             throw new NotFoundException("Comment is not found");
@@ -52,6 +58,7 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
     @Override
+    @Transactional
     public Double calculateRating(Long userId) {
         List<Comment> comments = repository.findAllByUserId(userId);
         //  Double rateSum = 0D;?
@@ -60,10 +67,11 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
     @Override
-    public Map<User, Double> calculateAllRating() {
+    @Transactional
+    public Map<User, Double> calculateAllRating(Boolean ascending) {
         List<Comment> comments = repository.findAll();
         Map<User, Integer> countOfRates = new HashMap<>();
-        Map<User, Double> rating = new HashMap<>();
+        Map<User, Double> rating = new LinkedHashMap<>();
         for (Comment comment : comments) {
             User user = comment.getUser();
             if (rating.containsKey(user)) {
@@ -78,16 +86,16 @@ public class CommentsServiceImpl implements CommentsService {
             entry.setValue(entry.getValue() / countOfRates.get(entry.getKey()));
         }
         return rating;
-       // Map<User, Double> newrate = rating.entrySet().stream()//.map(a -> a.setValue(rating.get(a) / countOfRates.get(a)))
-       //         .collect(Collectors.toMap(k -> k.getKey(), v -> v.setValue(rating.get(Map.Entry::getKey)));
-    }//usersConverter::convertToDTO, rating::get
+    }
 
     @Override
+    @Transactional
     public List<Comment> findAll() {
         return repository.findAll();
     }
 
     @Override
+    @Transactional
     public void updateComment(Comment comment, Long id) {
         Comment commentFromDB = repository.findById(id).orElse(null);
         if (commentFromDB == null || !commentFromDB.getApproved()) {
@@ -99,11 +107,13 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
     @Override
+    @Transactional
     public List<Comment> getUnapprovedComments() {
         return repository.findAllByApproved(false);
     }
 
     @Override
+    @Transactional
     public void approveComment(Long commentId) {
         Comment commentFromDB = repository.findById(commentId).orElseThrow(() -> {
             throw new NotFoundException("Comment is not found");
